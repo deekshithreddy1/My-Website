@@ -21,7 +21,7 @@
       border-radius: 8px;
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
       max-width: 900px;
-      margin: 0 auto;
+      margin: 20px auto;
     }
 
     .image-container {
@@ -51,12 +51,31 @@
 
     h1 {
       color: #444;
-      border-bottom: 3px solid #444;
-      padding-bottom: 10px;
-      margin-bottom: 20px;
+      margin-bottom: 10px;
       font-size: 1.8rem;
       text-transform: uppercase;
       letter-spacing: 1px;
+      display: inline-block;
+    }
+
+    .header {
+      display: flex;
+      align-items: baseline;
+      margin-bottom: 20px;
+    }
+
+    .header a {
+      margin-left: 15px;
+      text-decoration: none;
+      color: #007bff;
+      font-size: 1rem;
+      border-bottom: 2px solid transparent;
+      padding-bottom: 2px;
+      transition: border-bottom 0.2s;
+    }
+
+    .header a:hover {
+      border-bottom: 2px solid #007bff;
     }
 
     p {
@@ -88,18 +107,31 @@
       h1 {
         font-size: 1.5rem;
       }
+
+      .header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .header a {
+        margin-left: 0;
+        margin-top: 10px;
+      }
     }
   </style>
 </head>
 <body>
-  <h1>Understanding Gas in Ethereum Transactions</h1><a href="index.html">Home</a>
+  <div class="header">
+    <h1>Understanding Gas in Ethereum Transactions</h1>
+    <a href="DeekshithReddy.html">Home</a>
+  </div>
   <div class="container">
     <div class="image-container">
-      <img src="gasfee.png" alt="Gas Icon ">
-      <p>Gas</p>
+      <img src="gasfee.png" alt="Gas Icon">
+      <p>Gas Icon</p>
     </div>
     <div class="text-container">
-      <p>Higher gas limit: It leads to faster transaction times, but they also come with higher costs.</p>
+      <p>Higher gas limits lead to faster transaction times, but they also come with higher costs.</p>
       <p>Lower gas limit: When we pay a low fee to the miners, they won't prioritize the transaction, so it will take some time to execute. The higher-fee transactions will be executed first.</p>
       <p>Previously, we had a bidding system where we could set a high price to make the transaction fast. A low fee meant low priority, leading to delays in the transaction.</p>
       <p>Optimizing gas prices can be challenging because we can't predict gas limits and how transactions are prioritized. So, Ethereum came up with a plan where Ethereum sets a base fee for transactions, making all transactions equally prioritized. To address priority and the miners' issue of earning more, it also introduced a tip system. On top of the base fee, users can add a tip to prioritize their transaction when the network is busy.</p>
