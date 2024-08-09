@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ERC20 Token Tutorial</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        h1, h2, h3 {
+            color: #333;
+        }
+        p {
+            line-height: 1.6;
+        }
+        ul {
+            margin-left: 20px;
+        }
+        .code-box {
+            background-color: #f4f4f4;
+            border-left: 4px solid #333;
+            padding: 10px;
+            margin: 20px 0;
+            position: relative;
+        }
+        .code-box code {
+            display: block;
+            white-space: pre-wrap;
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .code-box button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #333;
+            color: #fff;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+        .code-box button:hover {
+            background-color: #555;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Creating an ERC20 Token Using Hardhat, Solidity, OpenZeppelin, Alchemy, Sepolia, and Metamask <a href="index.html">Home</a></h1>
+    <p><strong>Latest Tutorial Dated August 09, 2024</strong></p>
+
+    <p>Before starting, make sure you have an Alchemy account and a Metamask account in your browser. Additionally, ensure your Metamask Sepolia account has some tokens. You can get free tokens from <a href="https://www.alchemy.com/faucets/ethereum-sepolia" target="_blank">Alchemy's Sepolia Faucet</a>. These are dummy tokens, but to get dummy tokens we need to have real tokens in the metamaks wallet. I  bought 0.001 worth of real tokens from ROBINHOOD and transferred them to my Metamask account. You can buy some in your Metamask account as well.</p>
+
+    <h2>Step 1: Create a Folder for Your Project</h2>
+    <div class="code-box">
+        <button onclick="copyToClipboard('mkdir reddy')">Copy</button>
+        <code>mkdir reddy</code>
+    </div>
+
+    <p>Navigate to the folder and initialize your project:</p>
+    <div class="code-box">
+        <button onclick="copyToClipboard('npm init')">Copy</button>
+        <code>npm init</code>
+    </div>
+
+    <p>This will create a <strong>package.json</strong> file. Next, install Hardhat:</p>
+    <div class="code-box">
+        <button onclick="copyToClipboard('npm install --save-dev hardhat')">Copy</button>
+        <code>npm install --save-dev hardhat</code>
+    </div>
+
+    <p>This command will create a <strong>node_modules</strong> directory along with a <strong>package-lock.json</strong> file.</p>
+
+    <h2>Step 2: Create a Hardhat Project</h2>
+    <p>To create a project, use the following command:</p>
+    <div class="code-box">
+        <button onclick="copyToClipboard('npx hardhat init')">Copy</button>
+        <code>npx hardhat init</code>
+    </div>
+
+    <p>After running this command, you can select the type of project you want to create. I selected "Create an empty hardhat.config.js". This will create a <strong>hardhat.config.js</strong> file in the folder.</p>
+
+    <h2>Step 3: Set Up the Project Structure</h2>
+    <p>Since we created an empty project, we need to manually add the <strong>contracts</strong> and <strong>scripts</strong> folders:</p>
+    <div class="code-box">
+        <button onclick="copyToClipboard('mkdir contracts\nmkdir scripts')">Copy</button>
+        <code>mkdir contracts<br>mkdir scripts</code>
+    </div>
+
+    <p>The <strong>contracts</strong> folder will contain the contract files (e.g., <strong>MyToken.sol</strong>), and the <strong>scripts</strong> folder will contain the deployment scripts (e.g., <strong>deploy.js</strong>).</p>
+
+    <h2>Step 4: Create an ERC20 Token Contract</h2>
+    <p>We want to inherit some OpenZeppelin plugins to use the <strong>ERC20.sol</strong> from OpenZeppelin. First, install the OpenZeppelin contracts:</p>
+    <div class="code-box">
+        <button onclick="copyToClipboard('npm install @openzeppelin/contracts')">Copy</button>
+        <code>npm install @openzeppelin/contracts</code>
+    </div>
+
+    <p>Next, create a <strong>MyToken.sol</strong> file in the <strong>contracts</strong> folder and add the following code:</p>
+
+    <div class="code-box">
+        <button onclick="copyToClipboard(`// SPDX-License-Identifier: MIT\n\npragma solidity 0.8.20;\n\nimport "@openzeppelin/contracts/token/ERC20/ERC20.sol";\n\ncontract MyToken is ERC20 {\n\n    uint constant _initial_supply = 10000 * (10 ** 18);\n\n    constructor() ERC20("MyToken", "MKT") {\n        _mint(msg.sender, _initial_supply);\n    }\n}`)">Copy</button>
+        <code>// SPDX-License-Identifier: MIT<br><br>pragma solidity 0.8.20;<br><br>import "@openzeppelin/contracts/token/ERC20/ERC20.sol";<br><br>contract MyToken is ERC20 {<br><br>&nbsp;&nbsp;&nbsp;&nbsp;uint constant _initial_supply = 10000 * (10 ** 18);<br><br>&nbsp;&nbsp;&nbsp;&nbsp;constructor() ERC20("MyToken", "MKT") {<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;_mint(msg.sender, _initial_supply);<br>&nbsp;&nbsp;&nbsp;&nbsp;}<br>}</code>
+    </div>
+
+    <h2>Step 5: Compile the Contract</h2>
+    <p>Before compiling, create a <strong>.env</strong> file to store secure data. To do that, you need to install the dotenv package:</p>
+    <div class="code-box">
+        <button onclick="copyToClipboard('npm install dotenv --save')">Copy</button>
+        <code>npm install dotenv --save</code>
+    </div>
+
+    <p>After this, you should see this dependency in the <strong>package.json</strong> file. Now, create a <strong>.env</strong> file in the project folder.</p>
+
+    <p>In the <strong>.env</strong> file, add the following:</p>
+    <div class="code-box">
+        <button onclick="copyToClipboard('API_URL="https://eth-sepolia.g.alchemy.com/v2/your-api-key"\nPRIVATE_KEY="your-metamask-sepolia-private-key"')">Copy</button>
+        <code>API_URL="https://eth-sepolia.g.alchemy.com/v2/your-api-key"<br>PRIVATE_KEY="your-metamask-sepolia-private-key"</code>
+    </div>
+
+    <p>The API URL is found when you create an account in Alchemy and set up a project. Change the network to Sepolia and use the endpoint provided. The private key can be copied from your Metamask wallet.</p>
+
+    <h2>Step 6: Install Ethers.js and Hardhat Ethers Plugin</h2>
+    <p>You need to install Ethers.js in the project because we're using it:</p>
+    <div class="code-box">
+        <button onclick="copyToClipboard('npm install ethers@5.7.2')">Copy</button>
+        <code>npm install ethers@5.7.2</code>
+    </div>
+
+    <p>Also, install the Hardhat Ethers plugin:</p>
+    <div class="code-box">
+        <button onclick="copyToClipboard('npm install --save-dev @nomiclabs/hardhat-ethers')">Copy</button>
+        <code>npm install --save-dev @nomiclabs/hardhat-ethers</code>
+    </div>
+
+    <h2>Step 7: Update the Hardhat Configuration</h2>
+    <p>Now, update the <strong>hardhat.config.js</strong> file:</p>
+
+    <div class="code-box">
+        <button onclick="copyToClipboard(`require('dotenv').config();\nrequire("@nomiclabs/hardhat-ethers");\n\nconst { API_URL, PRIVATE_KEY } = process.env;\n\nmodule.exports = {\n  solidity: "0.8.20",\n  defaultNetwork: "sepolia",\n  networks: {\n    hardhat: {},\n    sepolia: {\n      url: API_URL,\n      accounts: [`0x${PRIVATE_KEY}`]\n    }\n  },\n}`)">Copy</button>
+        <code>require('dotenv').config();<br>require("@nomiclabs/hardhat-ethers");<br><br>const { API_URL, PRIVATE_KEY } = process.env;<br><br>module.exports = {<br>&nbsp;&nbsp;&nbsp;&nbsp;solidity: "0.8.20",<br>&nbsp;&nbsp;&nbsp;&nbsp;defaultNetwork: "sepolia",<br>&nbsp;&nbsp;&nbsp;&nbsp;networks: {<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;hardhat: {},<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;sepolia: {<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;url: API_URL,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;accounts: [`0x${PRIVATE_KEY}`]<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br>&nbsp;&nbsp;&nbsp;&nbsp;},<br>}</code>
+    </div>
+    <div>
+    <p> // IMPORTANT - KNOW the Difference between ('') and the (``)  they both are different. This ('') single quots and (``) this is Backtick. I had the problem to find the difference between them and took 2 days to find the bug in the hardhat.config.js  file.</p>
+    </div>
+
+    <p>Its time to Compile the project</p>
+    <div class="code-box">
+        <button onclick="copyToClipboard('npx hardhat compile')">Copy</button>
+        <code>npx hardhat compile</code>
+    </div>
+
+    <p> There was an error where i have used solidity vesion as 0.8.0 but  the openzeppelin contract which is ERC.sol is written is Solidity version ^0.8.20;
+
+        so i change the compiler version in .sol file and in the config file, to 0.8.20;
+        
+        </p>
+        <p>  The smart contract is compiled successfully</p>
+
+
+
+ 
+
+    <h2>Step 8: Write the Deploy Script</h2>
+    <p>Now, write the deploy script. Add a file to the <strong>scripts</strong> folder named <strong>deploy.js</strong>:</p>
+
+    <p>The <strong>deploy.js</strong> file should contain the following code:</p>
+
+    <div class="code-box">
+        <button onclick="copyToClipboard(`async function main() {\n    const [deployer] = await ethers.getSigners();\n\n    console.log("Deploying contract with the account:", deployer.address);\n\n    const weiAmount = (await deployer.getBalance()).toString();\n    console.log("Account Balance:", ethers.utils.formatEther(weiAmount));\n\n    const Token = await ethers.getContractFactory("MyToken");\n    const token = await Token.deploy();\n\n    console.log("Token address:", token.address);\n}\n\nmain()\n    .then(() => process.exit(0))\n    .catch((error) => {\n        console.error(error);\n        process.exit(1);\n    });`)">Copy</button>
+        <code>async function main() {<br>&nbsp;&nbsp;&nbsp;&nbsp;const [deployer] = await ethers.getSigners();<br><br>&nbsp;&nbsp;&nbsp;&nbsp;console.log("Deploying contract with the account:", deployer.address);<br><br>&nbsp;&nbsp;&nbsp;&nbsp;const weiAmount = (await deployer.getBalance()).toString();<br>&nbsp;&nbsp;&nbsp;&nbsp;console.log("Account Balance:", ethers.utils.formatEther(weiAmount));<br><br>&nbsp;&nbsp;&nbsp;&nbsp;const Token = await ethers.getContractFactory("MyToken");<br>&nbsp;&nbsp;&nbsp;&nbsp;const token = await Token.deploy();<br><br>&nbsp;&nbsp;&nbsp;&nbsp;console.log("Token address:", token.address);<br>}<br><br>main()<br>&nbsp;&nbsp;&nbsp;&nbsp;.then(() => process.exit(0))<br>&nbsp;&nbsp;&nbsp;&nbsp;.catch((error) => {<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;console.error(error);<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;process.exit(1);<br>&nbsp;&nbsp;&nbsp;&nbsp;});</code>
+    </div>
+
+    <h2>Step 9: Deploy the Contract to the Sepolia Test Network</h2>
+    <p>It's time to deploy the code to the Sepolia test network. Use the following command:</p>
+
+    <div class="code-box">
+        <button onclick="copyToClipboard('npx hardhat run scripts/deploy.js --network sepolia')">Copy</button>
+        <code>npx hardhat run scripts/deploy.js --network sepolia</code>
+    </div>
+
+    <p>After running this command, you should see output similar to the following:</p>
+
+    <p><strong>Deploying contract with the account: 0xa700000000000000000000000000000000</strong></p>
+    <p><strong>Account balance:</strong></p>
+    <p><strong>Token address: xe90s0s00ss00s0f0dfsd0gs0g0s0</strong></p>
+
+    <p>This token address contains the created tokens. To view these tokens:</p>
+
+    <ul>
+        <li>Go to Metamask</li>
+        <li>Select Sepolia testnet</li>
+        <li>Import the token</li>
+        <li>Add the token address</li>
+    </ul>
+
+    <p>Once imported, you can see the created tokens in Metamask. You can also transfer these tokens to another account.</p>
+
+    <p>I created another account in Metamask and transferred 50 tokens from the first account to the second account.</p>
+
+    <p>After sending the tokens, if you don't see them in the second account, it might be because the account doesn't recognize the token address. To fix this, you need to:</p>
+
+    <ul>
+        <li>Go to "Import Token" in the second account</li>
+        <li>Add the token address you received when deploying the contract</li>
+    </ul>
+
+    <p>Adding the token address will display the tokens transferred from the first account to the second account.</p>
+
+</body>
+<script>
+    function copyToClipboard(text) {
+        navigator.clipboard.writeText(text).then(() => {
+            alert("Copied to clipboard!");
+        });
+    }
+</script>
+</html>
